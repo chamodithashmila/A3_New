@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/CMCGNDivisions_1.js"></script>
+        <script src="data/Sites_needtodevelop_2.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[6.8667976491063305,79.80750901168292],[6.988000637290759,80.00059202515037]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatelliteHybrid_0');
+        map.getPane('pane_GoogleSatelliteHybrid_0').style.zIndex = 400;
+        var layer_GoogleSatelliteHybrid_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatelliteHybrid_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_GoogleSatelliteHybrid_0;
+        map.addLayer(layer_GoogleSatelliteHybrid_0);
+        function pop_CMCGNDivisions_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">PROVINCE_N</th>\
+                        <td class="visible-with-data" id="PROVINCE_N">' + (feature.properties['PROVINCE_N'] !== null ? autolinker.link(feature.properties['PROVINCE_N'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DISTRICT_N</th>\
+                        <td class="visible-with-data" id="DISTRICT_N">' + (feature.properties['DISTRICT_N'] !== null ? autolinker.link(feature.properties['DISTRICT_N'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DSD_N</th>\
+                        <td class="visible-with-data" id="DSD_N">' + (feature.properties['DSD_N'] !== null ? autolinker.link(feature.properties['DSD_N'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GND_N</th>\
+                        <td class="visible-with-data" id="GND_N">' + (feature.properties['GND_N'] !== null ? autolinker.link(feature.properties['GND_N'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TOT_POP</th>\
+                        <td class="visible-with-data" id="TOT_POP">' + (feature.properties['TOT_POP'] !== null ? autolinker.link(feature.properties['TOT_POP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">MALE</th>\
+                        <td class="visible-with-data" id="MALE">' + (feature.properties['MALE'] !== null ? autolinker.link(feature.properties['MALE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FEMALE</th>\
+                        <td class="visible-with-data" id="FEMALE">' + (feature.properties['FEMALE'] !== null ? autolinker.link(feature.properties['FEMALE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">0TO14</th>\
+                        <td class="visible-with-data" id="0TO14">' + (feature.properties['0TO14'] !== null ? autolinker.link(feature.properties['0TO14'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">15TO59</th>\
+                        <td class="visible-with-data" id="15TO59">' + (feature.properties['15TO59'] !== null ? autolinker.link(feature.properties['15TO59'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">OVER60</th>\
+                        <td class="visible-with-data" id="OVER60">' + (feature.properties['OVER60'] !== null ? autolinker.link(feature.properties['OVER60'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Area_m2</th>\
+                        <td class="visible-with-data" id="Area_m2">' + (feature.properties['Area_m2'] !== null ? autolinker.link(feature.properties['Area_m2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CMCGNDivisions_1_0() {
+            return {
+                pane: 'pane_CMCGNDivisions_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(213,180,60,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CMCGNDivisions_1');
+        map.getPane('pane_CMCGNDivisions_1').style.zIndex = 401;
+        map.getPane('pane_CMCGNDivisions_1').style['mix-blend-mode'] = 'normal';
+        var layer_CMCGNDivisions_1 = new L.geoJson(json_CMCGNDivisions_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CMCGNDivisions_1',
+            layerName: 'layer_CMCGNDivisions_1',
+            pane: 'pane_CMCGNDivisions_1',
+            onEachFeature: pop_CMCGNDivisions_1,
+            style: style_CMCGNDivisions_1_0,
+        });
+        bounds_group.addLayer(layer_CMCGNDivisions_1);
+        map.addLayer(layer_CMCGNDivisions_1);
+        function pop_Sites_needtodevelop_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">id</th>\
+                        <td class="visible-with-data" id="id">' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Town</th>\
+                        <td class="visible-with-data" id="Town">' + (feature.properties['Town'] !== null ? autolinker.link(feature.properties['Town'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Area</th>\
+                        <td class="visible-with-data" id="Area">' + (feature.properties['Area'] !== null ? autolinker.link(feature.properties['Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Image</th>\
+                        <td class="visible-with-data" id="Image">' + (feature.properties['Image'] !== null ? autolinker.link(feature.properties['Image'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Expec_Deve</th>\
+                        <td class="visible-with-data" id="Expec_Deve">' + (feature.properties['Expec_Deve'] !== null ? autolinker.link(feature.properties['Expec_Deve'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cur_status</th>\
+                        <td class="visible-with-data" id="Cur_status">' + (feature.properties['Cur_status'] !== null ? autolinker.link(feature.properties['Cur_status'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GN_Divisi</th>\
+                        <td class="visible-with-data" id="GN_Divisi">' + (feature.properties['GN_Divisi'] !== null ? autolinker.link(feature.properties['GN_Divisi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Land_Va_PP</th>\
+                        <td class="visible-with-data" id="Land_Va_PP">' + (feature.properties['Land_Va_PP'] !== null ? autolinker.link(feature.properties['Land_Va_PP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Land_Owner</th>\
+                        <td class="visible-with-data" id="Land_Owner">' + (feature.properties['Land_Owner'] !== null ? autolinker.link(feature.properties['Land_Owner'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Sites_needtodevelop_2_0() {
+            return {
+                pane: 'pane_Sites_needtodevelop_2',
+                opacity: 1,
+                color: 'rgba(240,69,12,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,69,12,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Sites_needtodevelop_2');
+        map.getPane('pane_Sites_needtodevelop_2').style.zIndex = 402;
+        map.getPane('pane_Sites_needtodevelop_2').style['mix-blend-mode'] = 'normal';
+        var layer_Sites_needtodevelop_2 = new L.geoJson(json_Sites_needtodevelop_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Sites_needtodevelop_2',
+            layerName: 'layer_Sites_needtodevelop_2',
+            pane: 'pane_Sites_needtodevelop_2',
+            onEachFeature: pop_Sites_needtodevelop_2,
+            style: style_Sites_needtodevelop_2_0,
+        });
+        bounds_group.addLayer(layer_Sites_needtodevelop_2);
+        map.addLayer(layer_Sites_needtodevelop_2);
+        var baseMaps = {};
+        var overlaysTree = [
+            {label: '<img src="legend/Sites_needtodevelop_2.png" /> Sites_need to develop', layer: layer_Sites_needtodevelop_2},
+            {label: '<img src="legend/CMCGNDivisions_1.png" /> CMC-GN Divisions', layer: layer_CMCGNDivisions_1},
+            {label: "Google Satellite Hybrid", layer: layer_GoogleSatelliteHybrid_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        </script>
+    </body>
+</html>
